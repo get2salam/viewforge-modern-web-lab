@@ -1,0 +1,20 @@
+{
+  "name": "ViewForge Modern Web Lab",
+  "short_name": "ViewForge",
+  "description": "Modern Web Platform lab with Vite, TypeScript, View Transitions and PWA shell",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f0f1a",
+  "theme_color": "#6c63ff",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["developer tools", "productivity"],
+  "lang": "en-US",
+  "orientation": "any"
+}
