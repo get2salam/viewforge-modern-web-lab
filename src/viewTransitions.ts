@@ -1,27 +1,19 @@
 type TransitionCallback = () => void | Promise<void>;
 
-interface ViewTransitionLike {
-  ready: Promise<void>;
-  finished: Promise<void>;
-  updateCallbackDone: Promise<void>;
-}
-
-declare global {
-  interface Document {
-    startViewTransition?: (cb: () => void | Promise<void>) => ViewTransitionLike;
-  }
-}
-
 export async function withViewTransition(
   callback: TransitionCallback,
   options: { types?: string[] } = {}
 ): Promise<void> {
-  if (!document.startViewTransition) {
+  const doc = document as Document & {
+    startViewTransition?: (cb: () => void | Promise<void>) => { finished: Promise<void> };
+  };
+
+  if (!doc.startViewTransition) {
     await callback();
     return;
   }
 
-  const transition = document.startViewTransition(async () => {
+  const transition = doc.startViewTransition(async () => {
     await callback();
   });
 
@@ -39,7 +31,9 @@ export async function withViewTransition(
 }
 
 export function supportsViewTransitions(): boolean {
-  return typeof document.startViewTransition === "function";
+  return typeof (
+    document as Document & { startViewTransition?: unknown }
+  ).startViewTransition === "function";
 }
 
 export function setViewTransitionName(element: HTMLElement, name: string): void {

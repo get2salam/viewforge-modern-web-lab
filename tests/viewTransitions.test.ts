@@ -6,31 +6,32 @@ import {
   clearViewTransitionName,
 } from "../src/viewTransitions.js";
 
+type DocWithVT = Document & { startViewTransition?: unknown };
+
 describe("supportsViewTransitions", () => {
   it("returns false when document.startViewTransition is absent", () => {
-    const original = (document as Document & { startViewTransition?: unknown })
-      .startViewTransition;
-    delete (document as Document & { startViewTransition?: unknown }).startViewTransition;
+    const original = (document as DocWithVT).startViewTransition;
+    delete (document as DocWithVT).startViewTransition;
     expect(supportsViewTransitions()).toBe(false);
     if (original !== undefined) {
-      (document as Document & { startViewTransition?: unknown }).startViewTransition = original;
+      (document as DocWithVT).startViewTransition = original;
     }
   });
 
   it("returns true when document.startViewTransition is a function", () => {
-    (document as Document & { startViewTransition?: unknown }).startViewTransition = vi.fn(() => ({
+    (document as DocWithVT).startViewTransition = vi.fn(() => ({
       ready: Promise.resolve(),
       finished: Promise.resolve(),
       updateCallbackDone: Promise.resolve(),
     }));
     expect(supportsViewTransitions()).toBe(true);
-    delete (document as Document & { startViewTransition?: unknown }).startViewTransition;
+    delete (document as DocWithVT).startViewTransition;
   });
 });
 
 describe("withViewTransition (no API)", () => {
   beforeEach(() => {
-    delete (document as Document & { startViewTransition?: unknown }).startViewTransition;
+    delete (document as DocWithVT).startViewTransition;
   });
 
   it("executes callback when API is absent", async () => {
@@ -51,19 +52,18 @@ describe("withViewTransition (with API)", () => {
       finished: Promise.resolve(),
       updateCallbackDone: Promise.resolve(),
     };
-    const startViewTransition = vi.fn(async (cb: () => void | Promise<void>) => {
+    const startVT = vi.fn(async (cb: () => void | Promise<void>) => {
       await cb();
       return mockTransition;
     });
-    (document as Document & { startViewTransition?: unknown }).startViewTransition =
-      startViewTransition;
+    (document as DocWithVT).startViewTransition = startVT;
 
     const cb = vi.fn();
     await withViewTransition(cb);
     expect(cb).toHaveBeenCalledOnce();
-    expect(startViewTransition).toHaveBeenCalledOnce();
+    expect(startVT).toHaveBeenCalledOnce();
 
-    delete (document as Document & { startViewTransition?: unknown }).startViewTransition;
+    delete (document as DocWithVT).startViewTransition;
   });
 });
 

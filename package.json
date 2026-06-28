@@ -5,16 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc -p tsconfig.build.json && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "smoke": "node scripts/smoke.mjs"
   },
   "devDependencies": {
+    "@types/node": "^20.14.0",
+    "jsdom": "^29.1.1",
     "typescript": "^5.4.5",
     "vite": "^5.2.11",
-    "vitest": "^1.6.0",
-    "@types/node": "^20.14.0"
+    "vitest": "^1.6.0"
   },
   "engines": {
     "node": ">=18"
