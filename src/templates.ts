@@ -1,5 +1,20 @@
 import type { AppState, Launch } from "./state.js";
 
+/** Escapes HTML special characters to prevent XSS in template strings. */
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
+
+/** Validates a CSS hex color; returns a safe fallback for any non-hex input. */
+export function sanitizeCssColor(color: string): string {
+  return /^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/.test(color) ? color : "#888888";
+}
+
 export const LAUNCHES: Launch[] = [
   {
     id: "orbit-notes",
@@ -107,7 +122,7 @@ function buildComposer(state: AppState): string {
       <div class="search-wrap">
         <label class="sr-only" for="search-input">Search launches</label>
         <input id="search-input" class="search-input" type="search"
-               placeholder="Search launches…" value="${state.searchQuery}"
+               placeholder="Search launches…" value="${escapeHtml(state.searchQuery)}"
                aria-label="Search launches" />
       </div>
     </div>
@@ -127,19 +142,19 @@ function buildCard(launch: Launch, state: AppState): string {
   return `
     <article class="launch-card ${isActive ? "launch-card--active" : ""}"
              data-launch-id="${launch.id}"
-             style="--card-color: ${launch.color}"
+             style="--card-color: ${sanitizeCssColor(launch.color)}"
              tabindex="0"
              role="button"
              aria-pressed="${isActive}"
-             aria-label="View ${launch.name} details">
+             aria-label="View ${escapeHtml(launch.name)} details">
       <div class="card-emoji" aria-hidden="true">${launch.emoji}</div>
       <div class="card-body">
         <div class="card-meta">
           <span class="badge badge--${launch.status}">${launch.status}</span>
-          <span class="card-category">${launch.category}</span>
+          <span class="card-category">${escapeHtml(launch.category)}</span>
         </div>
-        <h2 class="card-title">${launch.name}</h2>
-        <p class="card-tagline">${launch.tagline}</p>
+        <h2 class="card-title">${escapeHtml(launch.name)}</h2>
+        <p class="card-tagline">${escapeHtml(launch.tagline)}</p>
       </div>
       <div class="card-footer">
         <span class="card-cta">View details →</span>
@@ -152,19 +167,19 @@ export function buildDetailPanel(state: AppState): string {
   const launch = LAUNCHES.find((l) => l.id === state.activeLaunchId);
   if (!launch) return "";
   return `
-    <div class="detail-inner" style="--card-color: ${launch.color}">
+    <div class="detail-inner" style="--card-color: ${sanitizeCssColor(launch.color)}">
       <button class="btn btn-ghost detail-close" data-action="close-detail" aria-label="Close detail panel">✕</button>
       <div class="detail-header">
         <span class="detail-emoji" aria-hidden="true">${launch.emoji}</span>
         <div>
-          <h2 class="detail-title">${launch.name}</h2>
+          <h2 class="detail-title">${escapeHtml(launch.name)}</h2>
           <span class="badge badge--${launch.status}">${launch.status}</span>
         </div>
       </div>
-      <p class="detail-tagline">${launch.tagline}</p>
-      <p class="detail-description">${launch.description}</p>
+      <p class="detail-tagline">${escapeHtml(launch.tagline)}</p>
+      <p class="detail-description">${escapeHtml(launch.description)}</p>
       <dl class="detail-meta">
-        <dt>Category</dt><dd>${launch.category}</dd>
+        <dt>Category</dt><dd>${escapeHtml(launch.category)}</dd>
         <dt>Status</dt><dd>${launch.status}</dd>
       </dl>
     </div>
