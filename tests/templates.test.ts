@@ -120,6 +120,28 @@ describe("getFilteredLaunches", () => {
     const results = getFilteredLaunches(state);
     expect(results).toHaveLength(1);
   });
+
+  it("ignores a leading space from mobile keyboards/autocomplete", () => {
+    const state = initState();
+    state.searchQuery = " orbit";
+    const results = getFilteredLaunches(state);
+    expect(results).toHaveLength(1);
+    expect(results[0].name).toBe("Orbit Notes");
+  });
+
+  it("ignores a trailing space left over from copy-paste", () => {
+    const state = initState();
+    state.searchQuery = "pantry ";
+    const results = getFilteredLaunches(state);
+    expect(results).toHaveLength(1);
+    expect(results[0].id).toBe("pixel-pantry");
+  });
+
+  it("treats a whitespace-only query as no filter", () => {
+    const state = initState();
+    state.searchQuery = "   ";
+    expect(getFilteredLaunches(state)).toHaveLength(3);
+  });
 });
 
 describe("buildDetailPanel", () => {

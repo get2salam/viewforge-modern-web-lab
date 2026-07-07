@@ -189,7 +189,7 @@ export function buildDetailPanel(state: AppState): string {
 export function getFilteredLaunches(state: AppState): Launch[] {
   return LAUNCHES.filter((l) => {
     const matchesFilter = state.filter === "all" || l.status === state.filter;
-    const q = state.searchQuery.toLowerCase();
+    const q = state.searchQuery.trim().toLowerCase();
     const matchesSearch =
       !q ||
       l.name.toLowerCase().includes(q) ||
